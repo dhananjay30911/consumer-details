@@ -38,51 +38,58 @@
 let csvData = [];
 
 fetch('data.csv')
-.then(response => response.text())
 .then(text => {
-    const rows = text.split('\n');
-    csvData = rows.map(row => row.split(','));
+    const rows = text.trim().split('\n');
+
+    headers = rows[0].split(',');
+
+    csvData = rows.slice(1).map(row => {
+        return row.toLowerCase();  // store full row text
+    });
 });
 
 function searchData() {
     const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    // If search box is empty
     if (searchValue === "") {
-        document.getElementById('result').innerHTML = 
+        document.getElementById('result').innerHTML =
         "<div class='no-result'>Please enter a value to search</div>";
         return;
     }
 
+    let output = "";
     let found = false;
-    let output = "<table><tr>";
 
-    headers.forEach(header => {
-        output += "<th>" + header + "</th>";
-    });
-
-    output += "</tr>";
-
-    csvData.forEach(row => {
-        if (row.join(" ").toLowerCase().includes(searchValue)) {
+    csvData.forEach((row, index) => {
+        if (row.includes(searchValue)) {
             found = true;
+            const columns = row.split(',');
+
+            if (output === "") {
+                output += "<table><tr>";
+                headers.forEach(header => {
+                    output += "<th>" + header + "</th>";
+                });
+                output += "</tr>";
+            }
+
             output += "<tr>";
-            row.forEach(cell => {
-                output += "<td>" + cell + "</td>";
+            columns.forEach(col => {
+                output += "<td>" + col + "</td>";
             });
             output += "</tr>";
         }
     });
 
-    output += "</table>";
-
     if (found) {
+        output += "</table>";
         document.getElementById('result').innerHTML = output;
     } else {
-        document.getElementById('result').innerHTML = 
+        document.getElementById('result').innerHTML =
         "<div class='no-result'>No Record Found</div>";
     }
 }
+
 </script>
 
 </body>
