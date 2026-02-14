@@ -1,36 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Consumer Search</title>
+    <title>Consumer Search Portal</title>
+
+    <!-- Important for Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
             text-align: center;
-            margin-top: 50px;
         }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        .search-container {
+            margin: 20px 0;
+        }
+
         input {
             padding: 10px;
-            width: 300px;
+            width: 60%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
+
         button {
-            padding: 10px 20px;
+            padding: 10px 15px;
+            margin-left: 5px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
+
+        button:hover {
+            background: #34495e;
+        }
+
+        .table-container {
+            overflow-x: auto; /* Important for mobile scrolling */
+            margin-top: 20px;
+        }
+
         table {
-            margin: 20px auto;
             border-collapse: collapse;
+            width: 100%;
+            background: white;
+            min-width: 600px; /* Prevent table breaking */
         }
-        th, td {
-            border: 1px solid black;
+
+        th {
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            border: 1px solid #ddd;
             padding: 8px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        .message {
+            color: red;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 600px) {
+            input {
+                width: 90%;
+                margin-bottom: 10px;
+            }
+
+            button {
+                width: 95%;
+                margin: 5px 0;
+            }
         }
     </style>
 </head>
 <body>
 
-<h2>Consumer Search</h2>
+<h2>Consumer Search Portal</h2>
 
-<input type="text" id="searchInput" placeholder="Enter search value">
-<button onclick="searchData()">Search</button>
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Enter Account No / Name">
+    <button onclick="searchData()">Search</button>
+</div>
 
 <div id="result"></div>
 
@@ -42,13 +112,8 @@ fetch('data.csv')
 .then(response => response.text())
 .then(text => {
     const rows = text.trim().split('\n');
-
     headers = rows[0].split(',');
-
     csvData = rows.slice(1).map(row => row.toLowerCase());
-})
-.catch(error => {
-    console.error("Error loading CSV:", error);
 });
 
 function searchData() {
@@ -56,7 +121,7 @@ function searchData() {
 
     if (searchValue === "") {
         document.getElementById('result').innerHTML =
-        "<div style='color:red;'>Please enter a value to search</div>";
+        "<div class='message'>Please enter a value to search</div>";
         return;
     }
 
@@ -69,7 +134,7 @@ function searchData() {
             const columns = row.split(',');
 
             if (output === "") {
-                output += "<table><tr>";
+                output += "<div class='table-container'><table><tr>";
                 headers.forEach(header => {
                     output += "<th>" + header + "</th>";
                 });
@@ -85,11 +150,11 @@ function searchData() {
     });
 
     if (found) {
-        output += "</table>";
+        output += "</table></div>";
         document.getElementById('result').innerHTML = output;
     } else {
         document.getElementById('result').innerHTML =
-        "<div style='color:red;'>No Record Found</div>";
+        "<div class='message'>No Record Found</div>";
     }
 }
 </script>
