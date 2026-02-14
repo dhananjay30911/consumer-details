@@ -45,11 +45,27 @@ fetch('data.csv')
 });
 
 function searchData() {
-    const searchValue = document.getElementById('searchInput').value.toLowerCase();
-    let output = "<table>";
+    const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    csvData.forEach((row, index) => {
+    // If search box is empty
+    if (searchValue === "") {
+        document.getElementById('result').innerHTML = 
+        "<div class='no-result'>Please enter a value to search</div>";
+        return;
+    }
+
+    let found = false;
+    let output = "<table><tr>";
+
+    headers.forEach(header => {
+        output += "<th>" + header + "</th>";
+    });
+
+    output += "</tr>";
+
+    csvData.forEach(row => {
         if (row.join(" ").toLowerCase().includes(searchValue)) {
+            found = true;
             output += "<tr>";
             row.forEach(cell => {
                 output += "<td>" + cell + "</td>";
@@ -59,7 +75,13 @@ function searchData() {
     });
 
     output += "</table>";
-    document.getElementById('result').innerHTML = output;
+
+    if (found) {
+        document.getElementById('result').innerHTML = output;
+    } else {
+        document.getElementById('result').innerHTML = 
+        "<div class='no-result'>No Record Found</div>";
+    }
 }
 </script>
 
