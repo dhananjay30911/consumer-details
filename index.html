@@ -2,9 +2,7 @@
 <html>
 <head>
     <title>Consumer Search Portal</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,15 +11,8 @@
             padding: 20px;
             text-align: center;
         }
-
-        h2 {
-            color: #2c3e50;
-        }
-
-        .search-container {
-            margin: 20px 0;
-        }
-
+        h2 { color: #2c3e50; }
+        .search-container { margin: 20px 0; }
         input {
             padding: 10px;
             width: 60%;
@@ -29,7 +20,6 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         button {
             padding: 10px 15px;
             margin-left: 5px;
@@ -39,129 +29,122 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
-        button:hover {
-            background: #34495e;
-        }
-
+        button:hover { background: #34495e; }
         .table-container {
             overflow-x: auto;
             margin-top: 20px;
         }
-
         table {
             border-collapse: collapse;
             width: 100%;
             background: white;
             min-width: 600px;
         }
-
         th {
             background: #2c3e50;
             color: white;
             padding: 10px;
         }
-
         td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-
-        tr:nth-child(even) {
-            background: #f2f2f2;
-        }
-
+        tr:nth-child(even) { background: #f2f2f2; }
         .message {
             color: red;
             margin-top: 15px;
             font-weight: bold;
         }
-
         @media (max-width: 600px) {
-            input {
-                width: 90%;
-                margin-bottom: 10px;
-            }
-
-            button {
-                width: 95%;
-                margin: 5px 0;
-            }
+            input { width: 90%; margin-bottom: 10px; }
+            button { width: 95%; margin: 5px 0; }
         }
     </style>
 </head>
 <body>
+    <h2>Consumer Search Portal</h2>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Enter Account No / Name">
+        <button onclick="searchData()">Search</button>
+    </div>
+    <div id="result"></div>
 
-<h2>Consumer Search Portal</h2>
+    <script>
+        let jsonData = [];
 
-<div class="search-container">
-    <input type="text" id="searchInput" placeholder="Enter Account No / Name">
-    <button onclick="searchData()">Search</button>
-</div>
+        // Load data with error handling
+        fetch('data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('data.json not found. Please add the file.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                jsonData = data;
+                console.log('Data loaded:', jsonData.length, 'records');
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = 
+                    "<div class='message'>Error: " + error.message + "</div>";
+            });
 
-<div id="result"></div>
+        function searchData() {
+            const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('result');
 
-<script>
-let jsonData = [];
-
-fetch('data.json')
-.then(response => response.json())
-.then(data => {
-    jsonData = data;
-});
-
-function searchData() {
-    const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
-
-    if (searchValue.length < 3) {
-        document.getElementById('result').innerHTML =
-        "<div class='message'>Enter at least 3 characters</div>";
-        return;
-    }
-
-    let output = "";
-    let foundCount = 0;
-    let maxResults = 50;
-
-    jsonData.forEach(item => {
-
-        if (foundCount >= maxResults) return;
-
-        let rowText = Object.values(item).join(" ").toLowerCase();
-
-        if (rowText.includes(searchValue)) {
-            foundCount++;
-
-            if (output === "") {
-                output += "<div class='table-container'><table><tr>";
-
-                Object.keys(item).forEach(key => {
-                    output += "<th>" + key + "</th>";
-                });
-
-                output += "</tr>";
+            if (searchValue.length < 3) {
+                resultDiv.innerHTML = "<div class='message'>Enter at least 3 characters</div>";
+                return;
             }
 
-            output += "<tr>";
-            Object.values(item).forEach(value => {
-                output += "<td>" + value + "</td>";
+            if (jsonData.length === 0) {
+                resultDiv.innerHTML = "<div class='message'>Data not loaded yet. Try again in a moment.</div>";
+                return;
+            }
+
+            let output = "";
+            let foundCount = 0;
+            const maxResults = 50;
+
+            jsonData.forEach(item => {
+                if (foundCount >= maxResults) return;
+
+                let rowText = Object.values(item).join(" ").toLowerCase();
+
+                if (rowText.includes(searchValue)) {
+                    foundCount++;
+
+                    if (output === "") {
+                        output += "<div class='table-container'><table><tr>";
+                        Object.keys(item).forEach(key => {
+                            output += "<th>" + key + "</th>";
+                        });
+                        output += "</tr>";
+                    }
+
+                    output += "<tr>";
+                    Object.values(item).forEach(value => {
+                        output += "<td>" + value + "</td>";
+                    });
+                    output += "</tr>";
+                }
             });
-            output += "</tr>";
+
+            if (foundCount > 0) {
+                output += "</table></div>";
+                output += "<div class='message'>Showing " + foundCount + " result(s)</div>";
+                resultDiv.innerHTML = output;
+            } else {
+                resultDiv.innerHTML = "<div class='message'>No Record Found</div>";
+            }
         }
-    });
 
-    if (foundCount > 0) {
-        output += "</table></div>";
-        output += "<div class='message'>Showing " + foundCount + " result(s)</div>";
-        document.getElementById('result').innerHTML = output;
-    } else {
-        document.getElementById('result').innerHTML =
-        "<div class='message'>No Record Found</div>";
-    }
-}
-
-/* ===== Disable Right Click & Developer Tools ===== */
-
-document.addEventListener('contextmenu', function(e) {
-    e.preve
+        // Disable right-click (optional, as in original)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
