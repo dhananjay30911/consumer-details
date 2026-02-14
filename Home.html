@@ -2,15 +2,66 @@
 <html>
 <head>
     <title>Consumer Search</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+    </style>
 </head>
 <body>
 
 <h2>Consumer Search</h2>
 
-<input type="text" placeholder="Enter Meter Number">
-<button>Search</button>
+<input type="text" id="searchInput" placeholder="Enter search value">
+<button onclick="searchData()">Search</button>
 
-<p>This is your first live website 🎉</p>
+<div id="result"></div>
+
+<script>
+let csvData = [];
+
+fetch('data.csv')
+.then(response => response.text())
+.then(text => {
+    const rows = text.split('\n');
+    csvData = rows.map(row => row.split(','));
+});
+
+function searchData() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    let output = "<table>";
+
+    csvData.forEach((row, index) => {
+        if (row.join(" ").toLowerCase().includes(searchValue)) {
+            output += "<tr>";
+            row.forEach(cell => {
+                output += "<td>" + cell + "</td>";
+            });
+            output += "</tr>";
+        }
+    });
+
+    output += "</table>";
+    document.getElementById('result').innerHTML = output;
+}
+</script>
 
 </body>
 </html>
