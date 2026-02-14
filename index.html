@@ -105,45 +105,46 @@
 <div id="result"></div>
 
 <script>
-let csvData = [];
-let headers = [];
+let jsonData = [];
 
-fetch('data.csv')
-.then(response => response.text())
-.then(text => {
-    const rows = text.trim().split('\n');
-    headers = rows[0].split(',');
-    csvData = rows.slice(1).map(row => row.toLowerCase());
+fetch('data.json')
+.then(response => response.json())
+.then(data => {
+    jsonData = data;
 });
 
 function searchData() {
     const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    if (searchValue === "") {
+    if (searchValue.length < 3) {
         document.getElementById('result').innerHTML =
-        "<div class='message'>Please enter a value to search</div>";
+        "<div class='message'>Enter at least 3 characters</div>";
         return;
     }
 
     let output = "";
     let found = false;
 
-    csvData.forEach(row => {
-        if (row.includes(searchValue)) {
+    jsonData.forEach(item => {
+
+        let rowText = Object.values(item).join(" ").toLowerCase();
+
+        if (rowText.includes(searchValue)) {
             found = true;
-            const columns = row.split(',');
 
             if (output === "") {
                 output += "<div class='table-container'><table><tr>";
-                headers.forEach(header => {
-                    output += "<th>" + header + "</th>";
+
+                Object.keys(item).forEach(key => {
+                    output += "<th>" + key + "</th>";
                 });
+
                 output += "</tr>";
             }
 
             output += "<tr>";
-            columns.forEach(col => {
-                output += "<td>" + col + "</td>";
+            Object.values(item).forEach(value => {
+                output += "<td>" + value + "</td>";
             });
             output += "</tr>";
         }
