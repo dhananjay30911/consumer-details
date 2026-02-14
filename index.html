@@ -36,16 +36,19 @@
 
 <script>
 let csvData = [];
+let headers = [];
 
 fetch('data.csv')
+.then(response => response.text())
 .then(text => {
     const rows = text.trim().split('\n');
 
     headers = rows[0].split(',');
 
-    csvData = rows.slice(1).map(row => {
-        return row.toLowerCase();  // store full row text
-    });
+    csvData = rows.slice(1).map(row => row.toLowerCase());
+})
+.catch(error => {
+    console.error("Error loading CSV:", error);
 });
 
 function searchData() {
@@ -53,14 +56,14 @@ function searchData() {
 
     if (searchValue === "") {
         document.getElementById('result').innerHTML =
-        "<div class='no-result'>Please enter a value to search</div>";
+        "<div style='color:red;'>Please enter a value to search</div>";
         return;
     }
 
     let output = "";
     let found = false;
 
-    csvData.forEach((row, index) => {
+    csvData.forEach(row => {
         if (row.includes(searchValue)) {
             found = true;
             const columns = row.split(',');
@@ -86,10 +89,9 @@ function searchData() {
         document.getElementById('result').innerHTML = output;
     } else {
         document.getElementById('result').innerHTML =
-        "<div class='no-result'>No Record Found</div>";
+        "<div style='color:red;'>No Record Found</div>";
     }
 }
-
 </script>
 
 </body>
