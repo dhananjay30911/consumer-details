@@ -123,14 +123,17 @@ function searchData() {
     }
 
     let output = "";
-    let found = false;
+    let foundCount = 0;
+    let maxResults = 50;
 
     jsonData.forEach(item => {
+
+        if (foundCount >= maxResults) return;
 
         let rowText = Object.values(item).join(" ").toLowerCase();
 
         if (rowText.includes(searchValue)) {
-            found = true;
+            foundCount++;
 
             if (output === "") {
                 output += "<div class='table-container'><table><tr>";
@@ -150,14 +153,16 @@ function searchData() {
         }
     });
 
-    if (found) {
+    if (foundCount > 0) {
         output += "</table></div>";
+        output += "<div class='message'>Showing " + foundCount + " result(s)</div>";
         document.getElementById('result').innerHTML = output;
     } else {
         document.getElementById('result').innerHTML =
         "<div class='message'>No Record Found</div>";
     }
 }
+
 </script>
 
 </body>
